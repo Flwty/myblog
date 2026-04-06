@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+@import "tailwindcss";
+
+/* 引入开源的 Zpix 像素中文字体 */
+@font-face {
+  font-family: 'Zpix';
+  src: url('https://cdn.jsdelivr.net/gh/SolidZORO/zpix-pixel-font/zpix.woff2') format('woff2');
+  font-display: swap;
+}
+
+@theme {
+  /* 优先使用 DotGothic16 (英/日)，回退到 Zpix (中文)，再回退到 SimSun (宋体) */
+  --font-pixel: "DotGothic16", "Zpix", "SimSun", sans-serif;
+}
+
+body {
+  @apply bg-[#FAFAFA] text-slate-800;
+  font-family: "DotGothic16", "Zpix", "SimSun", sans-serif;
+  
+  /* 禁用字体平滑，让系统默认中文字体（如宋体）也能呈现像素边缘 */
+  -webkit-font-smoothing: none;
+  
+  /* 使用十字光标增强复古游戏感 */
+  cursor: crosshair;
+  overflow-x: hidden;
+}
+
+/* 全局图片像素化处理 */
+img {
+  image-rendering: pixelated;
+  filter: contrast(1.1) saturate(0.8);
+}
+
+/* 自定义选中文本的颜色 */
+::selection {
+  @apply bg-slate-800 text-[#FAFAFA];
+}
+
+/* ==========================================
+   自定义像素风 UI 组件类 (Utility Classes)
+   ========================================== */
+
+.pixel-btn {
+  /* 默认使用浅色背景和深色文字，确保清晰可见 */
+  @apply border-2 border-slate-800 bg-[#FAFAFA] text-slate-800 px-4 py-2 font-bold uppercase tracking-widest 
+         shadow-[4px_4px_0px_0px_#cbd5e1] transition-all 
+         hover:bg-slate-100 hover:cursor-pointer
+         active:translate-x-[4px] active:translate-y-[4px] active:shadow-none;
+}
+
+.pixel-card {
+  @apply border-2 border-slate-800 bg-white 
+         shadow-[8px_8px_0px_0px_#e2e8f0] transition-all 
+         hover:-translate-y-2 hover:shadow-[8px_12px_0px_0px_#cbd5e1] hover:cursor-pointer;
+}
+
+.pixel-dialog {
+  @apply border-4 border-slate-800 bg-white shadow-[8px_8px_0px_0px_#cbd5e1] relative;
+}
+
+.pixel-tag {
+  @apply border-2 border-slate-800 bg-slate-100 px-2 py-1 text-xs uppercase tracking-wider;
+}
+
+/* 磁性文字过渡效果 */
+.magnetic {
+  transition: transform 0.1s ease-out;
+  display: inline-block;
+}
