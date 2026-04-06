@@ -1,10 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
-import 'gitalk/dist/gitalk.css';
-import GitalkComponent from 'gitalk/dist/gitalk-component';
-import { auth, googleProvider, twitterProvider, githubProvider } from './firebase';
-import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 // ==========================================
 // 0. 全局配置 (CONFIG)
@@ -13,7 +9,7 @@ import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 const ENABLE_TYPEWRITER_LOOP = true;
 
 // ==========================================
-// 1. 模拟数据与常量 (MOCK DATA & CONSTANTS)
+// 1. 模拟数据 (MOCK DATA)
 // ==========================================
 const POSTS = [
   {
@@ -66,74 +62,10 @@ const POSTS = [
 // ==========================================
 // 2. 全局状态与特效 (CONTEXT & EFFECTS)
 // ==========================================
-interface User {
-  uid: string;
-  displayName: string;
-  provider: string;
-}
-
 const AppContext = createContext<any>(null);
 
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isMagneticMode, setIsMagneticMode] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [readPosts, setReadPosts] = useState<number[]>([]);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-
-  // Load state from localStorage
-  useEffect(() => {
-    const savedReads = localStorage.getItem('pixel_reads');
-    if (savedReads) setReadPosts(JSON.parse(savedReads));
-    
-    // Listen to Firebase Auth state
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser({
-          uid: currentUser.uid,
-          displayName: currentUser.displayName || 'User',
-          provider: currentUser.providerData[0]?.providerId || 'Unknown'
-        });
-      } else {
-        setUser(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('pixel_reads', JSON.stringify(readPosts));
-  }, [readPosts]);
-
-  const markPostAsRead = (postId: number) => {
-    if (!readPosts.includes(postId)) {
-      setReadPosts(prev => [...prev, postId]);
-    }
-  };
-
-  const login = async (providerName: string) => {
-    let provider;
-    if (providerName === 'Google') provider = googleProvider;
-    else if (providerName === 'X') provider = twitterProvider;
-    else if (providerName === 'GitHub') provider = githubProvider;
-    
-    if (provider) {
-      try {
-        await signInWithPopup(auth, provider);
-        setAuthModalOpen(false);
-      } catch (error) {
-        console.error("Login failed:", error);
-        alert("Login failed. Please check console for details. (Make sure Firebase is configured in .env)");
-      }
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
 
   // 磁性文字效果核心逻辑 (优化版：针对单个文字)
   useEffect(() => {
@@ -231,11 +163,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isMagneticMode]);
 
   return (
-    <AppContext.Provider value={{ 
-      isMagneticMode, setIsMagneticMode,
-      user, login, logout, authModalOpen, setAuthModalOpen,
-      readPosts, markPostAsRead
-    }}>
+    <AppContext.Provider value={{ isMagneticMode, setIsMagneticMode }}>
       {children}
     </AppContext.Provider>
   );
@@ -244,32 +172,6 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
 // ==========================================
 // 3. 共享组件 (SHARED COMPONENTS)
 // ==========================================
-
-const AuthModal = () => {
-  const { authModalOpen, setAuthModalOpen, login } = useContext(AppContext);
-
-  if (!authModalOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[80] bg-slate-800/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setAuthModalOpen(false)}>
-      <div className="pixel-dialog w-full max-w-sm p-6 text-center" onClick={e => e.stopPropagation()}>
-        <h3 className="text-xl font-bold mb-6 uppercase"><MagneticText text="Select Login Provider" /></h3>
-        <div className="flex flex-col gap-4">
-          <button className="pixel-btn w-full hover:bg-slate-200" onClick={() => login('Google')}>
-            <MagneticText text="Login with Google" />
-          </button>
-          <button className="pixel-btn w-full hover:bg-slate-200" onClick={() => login('X')}>
-            <MagneticText text="Login with X" />
-          </button>
-          <button className="pixel-btn w-full hover:bg-slate-200" onClick={() => login('GitHub')}>
-            <MagneticText text="Login with GitHub" />
-          </button>
-        </div>
-        <button className="mt-6 text-xs text-slate-500 underline" onClick={() => setAuthModalOpen(false)}>Cancel</button>
-      </div>
-    </div>
-  );
-};
 
 /**
  * 磁性文字组件 (MagneticText)
@@ -306,7 +208,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [specialMenuOpen, setSpecialMenuOpen] = useState(false);
   
-  const { isMagneticMode, setIsMagneticMode, user, setAuthModalOpen, logout } = useContext(AppContext);
+  const { isMagneticMode, setIsMagneticMode } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -379,17 +281,6 @@ const Navbar = () => {
             >
               <MagneticText text="SEARCH" />
             </button>
-
-            {/* 登录/用户信息 */}
-            {user ? (
-              <button className="pixel-btn text-sm border-blue-600 text-blue-600 hover:bg-blue-50" onClick={logout}>
-                <MagneticText text={`[ ${user.displayName} ]`} />
-              </button>
-            ) : (
-              <button className="pixel-btn text-sm hover:bg-slate-200" onClick={() => setAuthModalOpen(true)}>
-                <MagneticText text="LOGIN" />
-              </button>
-            )}
           </div>
 
           {/* 移动端菜单按钮 */}
@@ -474,15 +365,6 @@ const Navbar = () => {
               >
                 <MagneticText text={`Toggle Magnetic: ${isMagneticMode ? 'ON' : 'OFF'}`} />
               </button>
-              {user ? (
-                <button className="pixel-btn w-full text-center border-blue-600 text-blue-600" onClick={() => { logout(); setMobileMenuOpen(false); }}>
-                  <MagneticText text={`Logout (${user.displayName})`} />
-                </button>
-              ) : (
-                <button className="pixel-btn w-full text-center" onClick={() => { setAuthModalOpen(true); setMobileMenuOpen(false); }}>
-                  <MagneticText text="Login" />
-                </button>
-              )}
             </div>
           </motion.div>
         )}
@@ -491,29 +373,25 @@ const Navbar = () => {
   );
 };
 
-const Footer = () => {
-  const { readPosts } = useContext(AppContext);
-  
-  return (
-    <footer className="border-t-4 border-slate-800 bg-slate-200 mt-auto">
-      <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="text-center md:text-left">
-          <span className="text-lg font-bold uppercase tracking-widest block mb-1">
-            <MagneticText text="Akihiro_" />
-          </span>
-          <span className="text-xs text-slate-500">
-            <MagneticText text={`LEVEL ${Math.floor(readPosts.length / 2) + 1} | EXP: ${readPosts.length * 100}`} />
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-4 text-sm font-bold">
-          <a href="#" className="pixel-btn text-xs"><MagneticText text="TWITTER" /></a>
-          <a href="#" className="pixel-btn text-xs"><MagneticText text="GITHUB" /></a>
-        </div>
+const Footer = () => (
+  <footer className="border-t-4 border-slate-800 bg-slate-200 mt-auto">
+    <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="text-center md:text-left">
+        <span className="text-lg font-bold uppercase tracking-widest block mb-1">
+          <MagneticText text="Akihiro_" />
+        </span>
+        <span className="text-xs text-slate-500">
+          <MagneticText text="LEVEL 99 | HP: 999/999" />
+        </span>
       </div>
-    </footer>
-  );
-};
+      
+      <div className="flex items-center gap-4 text-sm font-bold">
+        <a href="#" className="pixel-btn text-xs"><MagneticText text="TWITTER" /></a>
+        <a href="#" className="pixel-btn text-xs"><MagneticText text="GITHUB" /></a>
+      </div>
+    </div>
+  </footer>
+);
 
 // ==========================================
 // 4. 页面组件 (PAGES)
@@ -577,7 +455,7 @@ const Home = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="pixel-dialog p-6 md:p-10 text-left relative"
+          className="pixel-dialog p-6 md:p-10 text-left"
         >
           <div className="absolute -top-5 left-6 bg-slate-800 text-white px-4 py-1 border-2 border-slate-800 text-sm tracking-widest uppercase">
             Akihiro
@@ -707,13 +585,6 @@ const Journal = () => {
 const PostDetail = () => {
   const { id } = useParams();
   const post = POSTS.find(p => p.id === Number(id));
-  const { markPostAsRead } = useContext(AppContext);
-
-  useEffect(() => {
-    if (post) {
-      markPostAsRead(post.id);
-    }
-  }, [post, markPostAsRead]);
 
   if (!post) {
     return (
@@ -735,7 +606,7 @@ const PostDetail = () => {
         </span>
       </div>
       
-      <article className="pixel-dialog p-6 md:p-12 relative mb-12">
+      <article className="pixel-dialog p-6 md:p-12">
         <div className="flex items-center gap-2 mb-6">
           <span className="pixel-tag">{post.category}</span>
           <span className="text-sm text-slate-500 font-bold">{post.date}</span>
@@ -753,28 +624,6 @@ const PostDetail = () => {
           <MagneticText text={post.content} />
         </div>
       </article>
-
-      {/* Gitalk 评论区 */}
-      <div className="pixel-dialog p-6 md:p-12">
-        <h3 className="text-2xl font-bold mb-6 uppercase border-b-4 border-slate-800 pb-2"><MagneticText text="Comments" /></h3>
-        {import.meta.env.VITE_GITALK_CLIENT_ID ? (
-          <GitalkComponent options={{
-            clientID: import.meta.env.VITE_GITALK_CLIENT_ID,
-            clientSecret: import.meta.env.VITE_GITALK_CLIENT_SECRET,
-            repo: import.meta.env.VITE_GITALK_REPO,
-            owner: import.meta.env.VITE_GITALK_OWNER,
-            admin: [import.meta.env.VITE_GITALK_ADMIN || import.meta.env.VITE_GITALK_OWNER],
-            id: `post_${post.id}`,
-            title: post.title,
-            distractionFreeMode: false
-          }} />
-        ) : (
-          <div className="text-center py-10 border-4 border-dashed border-slate-300 bg-slate-50">
-            <p className="text-slate-500 font-bold mb-2">Gitalk is not configured.</p>
-            <p className="text-xs text-slate-400">Please set VITE_GITALK_CLIENT_ID and other variables in your .env file.</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
@@ -870,10 +719,9 @@ const Gallery = () => {
 export default function App() {
   return (
     <AppProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <div className="min-h-screen flex flex-col">
           <Navbar />
-          <AuthModal />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
