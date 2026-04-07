@@ -1,16 +1,70 @@
-# 👾 像素风博客操作指南 (小白专属)
+# 👾 像素风博客：从零开始的终极操作指南
 
-欢迎使用你的专属像素风博客！这份指南专为没有编程基础的新手编写，将手把手教你如何管理和扩展你的网站。
+你好！欢迎来到你的专属像素风博客。这份指南是为你量身定制的，**完全不需要你有任何编程基础**。
+
+我会用最通俗易懂的语言，手把手教你如何管理、修改和扩展这个网站。只要你跟着步骤一步步来，你就能完全掌控你的数字花园！
 
 ---
 
-## 📝 1. 如何添加新的博客文章？
+## 📁 第一部分：认识你的网站文件
 
-你的所有文章数据目前保存在 `src/App.tsx` 文件中。按照以下步骤即可添加新文章：
+在左侧的文件浏览器中，有很多文件和文件夹。但作为网站的主人，你**只需要关心以下几个文件**：
 
-### 第一步：找到文章数据区
-在左侧的文件浏览器中，点击打开 `src/App.tsx` 文件。
-在文件的大约第 14 行，你会看到这样一段代码：
+1. **`src/App.tsx`**：这是你网站的**核心心脏**！你网站上的所有文字、文章数据、页面排版、导航栏，全都在这个文件里。**你 90% 的修改都会在这里进行。**
+2. **`src/index.css`**：这是网站的**衣服**（样式表）。网站的背景颜色、像素风的边框、字体的粗细，都是在这里定义的。
+3. **`vite.config.ts`**：这是网站的**打包设置**。当你需要把网站发布到 GitHub Pages 时，你需要修改这里面的 `base` 路径。
+
+---
+
+## 📝 第二部分：如何修改个人信息？
+
+打开 `src/App.tsx` 文件，你可以修改主页上的个人信息。
+
+### 1. 修改打字机（Terminal）里的文字
+在代码的大约第 `400` 行左右，你会看到这样一段代码：
+```javascript
+const Home = () => {
+  const fullText = "Hello, traveler. Welcome to my digital garden.\n\nI document life, design, and the quiet moments in between. Stay a while and listen.";
+// ...
+```
+**怎么改？**
+直接把引号 `""` 里面的英文换成你想说的话。
+*提示：如果你想换行，请在文字中间加上 `\n\n`（两个反斜杠加n），这代表回车换行。*
+
+### 2. 修改左侧 Info 栏的头像、名字和简介
+在代码的大约第 `480` 行左右（在 `<!-- Sidebar / Info -->` 下面），你会看到：
+```javascript
+// 修改头像：把 src 里面的网址换成你自己的图片网址
+<img src="https://picsum.photos/seed/avatar/200/200" alt="Avatar" ... />
+
+// 修改名字：把 Akihiro 换成你的名字
+<MagneticText text="Akihiro" />
+
+// 修改简介：直接修改这里的文字
+<p className="text-sm font-bold text-slate-500 mb-6">
+  Digital Nomad & Developer. I love building things and sharing my journey with the world.
+</p>
+```
+
+### 3. 修改社交链接（GitHub, Twitter, Instagram）
+紧接着简介的下方，你会看到按钮的代码：
+```javascript
+<a href="#" className="pixel-btn px-3 py-1 text-xs">GitHub</a>
+<a href="#" className="pixel-btn px-3 py-1 text-xs">Twitter</a>
+<a href="#" className="pixel-btn px-3 py-1 text-xs">Instagram</a>
+```
+**怎么改？**
+把 `href="#"` 里面的 `#` 换成你真实的个人主页链接。
+例如：`<a href="https://twitter.com/你的ID" className="...">Twitter</a>`
+
+---
+
+## 📚 第三部分：如何发布和管理博客文章？
+
+你的所有文章并没有存在复杂的数据库里，而是直接写在了代码里，这叫“静态博客”，非常快且安全！
+
+### 1. 找到文章仓库
+打开 `src/App.tsx`，在文件最顶部（大约第 14 行），你会看到一个叫 `POSTS` 的列表：
 ```javascript
 const POSTS = [
   {
@@ -18,122 +72,89 @@ const POSTS = [
     title: "A Quiet Morning in Kyoto",
     // ...
 ```
-这个 `POSTS` 列表里面包含了你所有的文章。
 
-### 第二步：复制并修改文章模板
-在 `POSTS` 列表的最后（或者最前面），复制并粘贴以下模板，然后修改里面的内容：
+### 2. 添加新文章
+在 `POSTS` 列表的最前面（或者最后面），复制并粘贴以下模板，然后填入你的内容：
 
 ```javascript
   {
-    id: 6, // ⚠️ 注意：这里的 id 必须是唯一的数字，不能和其他文章重复！
+    id: 6, // ⚠️ 极度重要：这个数字必须是唯一的！如果上一篇是 5，这篇就是 6。
     title: "你的新文章标题",
-    excerpt: "这是一段简短的摘要，会显示在主页的文章列表中。",
-    content: "这里是文章的正文内容。\n\n如果你想换行，请使用两个斜杠加一个n，就像这样：\n\n这是新的一段。",
-    date: "2026-04-10", // 文章日期
-    image: "https://picsum.photos/seed/anyword/800/600", // 文章封面图链接
-    category: "分类名称" // 比如：Life, Tech, Thoughts
+    excerpt: "这是一段简短的摘要，会显示在主页和列表页。",
+    content: "这里是文章的正文内容。\n\n如果你想分段，请使用两个斜杠加n，就像这样：\n\n这是新的一段。",
+    date: "2026-04-10", // 文章发布的日期
+    image: "https://picsum.photos/seed/anyword/800/600", // 文章封面的图片链接
+    category: "Life" // 文章的分类，比如 Tech, Life, Art
   }, // ⚠️ 注意：除了最后一篇文章，每篇文章的大括号 } 后面都要加一个英文逗号 ,
 ```
-
-保存文件后，你的新文章就会自动出现在主页和 Journal（文章列表）页面中了！
+只要你保存了文件，新文章就会自动出现在主页的 "Recent Items" 和 "Journal" 列表里！
 
 ---
 
-## 🧭 2. 如何扩展导航栏（添加新菜单）？
+## 🧭 第四部分：如何扩展导航栏？
 
-如果你想在顶部导航栏添加一个新的页面链接（比如“关于我” `About`），你需要同时修改**电脑端**和**手机端**的导航菜单。
+如果你想在顶部导航栏加一个新页面（比如“关于我” `About`）。
 
-### 第一步：添加电脑端菜单
-在 `src/App.tsx` 文件中，搜索（Ctrl+F 或 Cmd+F）这段代码：`{/* 桌面端菜单 */}`。
-你会看到类似这样的代码：
-```javascript
-<Link to="/journal" className="pixel-btn text-sm">
-  <MagneticText text="[ Journal ]" />
-</Link>
-<Link to="/gallery" className="pixel-btn text-sm">
-  <MagneticText text="[ Gallery ]" />
-</Link>
-```
-在它们下面，添加你的新菜单：
+### 1. 修改电脑端菜单
+在 `src/App.tsx` 搜索 `{/* 桌面端菜单 */}`。在现有的 `<Link>` 标签下面加上：
 ```javascript
 <Link to="/about" className="pixel-btn text-sm">
   <MagneticText text="[ About ]" />
 </Link>
 ```
 
-### 第二步：添加手机端菜单
-继续在 `src/App.tsx` 文件中搜索：`{/* 移动端菜单遮罩层 */}`。
-往下找，你会看到包含 `Home`, `Journal`, `Gallery` 的列表。
-在 `Gallery` 这一行下面，添加你的新菜单：
+### 2. 修改手机端菜单
+在 `src/App.tsx` 搜索 `{/* 移动端菜单遮罩层 */}`。在现有的 `<Link>` 标签下面加上：
 ```javascript
 <Link to="/about" className="pixel-btn w-full text-center" onClick={() => setMobileMenuOpen(false)}>
   <MagneticText text="About" />
 </Link>
 ```
-
-*(注：如果你添加了 `/about` 链接，你还需要在代码底部的 `<Routes>` 里面添加对应的页面组件，如果你需要新建页面，可以随时告诉我帮你写代码！)*
-
----
-
-## 💬 3. 评论功能 (Gitalk) 准备工作
-
-你提到需要使用 Gitalk 作为评论系统。Gitalk 是基于 GitHub Issue 的，因此你需要去 GitHub 申请一个“通行证”（OAuth App）。请按照以下步骤操作：
-
-1. 登录你的 [GitHub 账号](https://github.com/)。
-2. 点击右上角头像 -> **Settings** (设置)。
-3. 在左侧菜单滑到最底部，点击 **Developer settings**。
-4. 点击左侧的 **OAuth Apps**，然后点击 **New OAuth App** 按钮。
-5. 填写信息：
-   - **Application name**: 你的博客名字（比如 `My Pixel Blog`）
-   - **Homepage URL**: 你的网站首页链接（比如 `https://你的网站域名.com`）
-   - **Application description**: 随便填
-   - **Authorization callback URL**: 填和 Homepage URL 一样的链接。
-6. 点击 **Register application**。
-7. 注册成功后，你会看到一个 **Client ID**。把它复制保存下来。
-8. 点击 **Generate a new client secret**，生成一个 **Client Secret**。把它复制保存下来（注意，这个密码只显示一次！）。
-
-**准备好 `Client ID` 和 `Client Secret` 后，请把它们发给我，我就可以帮你把 Gitalk 评论区加到博文正文的底部了！**
+*(注：如果你加了新链接，还需要写新页面的代码。如果你不会写，随时在聊天框里告诉我：“帮我写一个 About 页面”，我会直接帮你写好！)*
 
 ---
 
-## 🏆 4. 关于账号、成就与贴纸系统
+## 🚀 第五部分：如何将网站免费部署到 GitHub Pages？
 
-这个功能比较复杂，需要用到数据库（Firebase）来记录每个用户的阅读量和贴纸数据。
-目前我正在等待你确认 Firebase 的设置。一旦配置完成，我就会开始编写这部分的代码！
+想让全世界都能访问你的博客？跟着做：
 
----
+### 1. 导出代码到 GitHub
+在当前 AI Studio 界面的右上角，点击 **Export to GitHub**。
+连接你的账号，创建一个新仓库，比如叫 `myblog`。
 
-## 🚀 5. 如何将网站免费部署到 GitHub Pages？
-
-你想让全世界都能访问你的博客吗？你可以使用 GitHub Pages 免费托管它！以下是小白专属部署步骤：
-
-### 第一步：将代码导出到 GitHub
-1. 在当前 AI Studio 界面的右上角（或者设置菜单中），找到 **Export to GitHub**（导出到 GitHub）选项。
-2. 按照提示连接你的 GitHub 账号，并创建一个新的代码仓库（Repository），比如命名为 `my-pixel-blog`。
-
-### 第二步：修改 Vite 配置 (非常重要)
-在部署之前，你需要告诉系统你的网站路径。
-1. 在 GitHub 上打开你刚创建的仓库，找到 `vite.config.ts` 文件并点击编辑（铅笔图标）。
-2. 修改它，添加 `base` 属性。如果你的仓库名叫 `my-pixel-blog`，代码应该改成这样：
+### 2. 修改 Vite 配置 (非常重要)
+在 GitHub 上打开你的 `myblog` 仓库，找到 `vite.config.ts` 文件，点击铅笔图标编辑。
+把 `base` 后面的名字改成你的仓库名：
 ```typescript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  base: '/my-pixel-blog/', // ⚠️ 这里换成你的仓库名字！
-})
+export default defineConfig(({mode}) => {
+  return {
+    base: '/myblog/', // ⚠️ 这里必须和你的仓库名字一模一样，前后都要有斜杠！
+    plugins: [react(), tailwindcss()],
+    // ...
 ```
-保存提交（Commit changes）。
+点击 **Commit changes** 保存。
 
-### 第三步：设置 GitHub Actions 自动部署
-1. 在你的 GitHub 仓库页面，点击顶部的 **Settings** (设置) 选项卡。
-2. 在左侧菜单找到 **Pages**。
-3. 在 **Build and deployment** 下的 **Source** 下拉菜单中，选择 **GitHub Actions**。
-4. GitHub 会自动推荐一些工作流（Workflows），点击 **Static HTML** 或者搜索 **Vite** 的部署模板。
-5. **更简单的做法**：你可以直接在 AI Studio 里告诉我：“**请帮我配置好 GitHub Pages 的自动部署文件**”。我会直接在代码里生成一个 `.github/workflows/deploy.yml` 文件。这样你导出到 GitHub 后，它就会**全自动**完成部署，你什么都不用管！
+### 3. 自动部署
+我已经为你写好了自动化部署脚本（在 `.github/workflows/deploy.yml` 里）。
+所以你修改完 `vite.config.ts` 后，GitHub 会**全自动**帮你把网站发布出去！
+你只需要去仓库顶部的 **Settings -> Pages** 里面，就能看到你的专属网站链接了。
 
-### 第四步：等待部署完成
-配置好之后，每次你修改代码并保存到 GitHub，它都会自动帮你重新部署。
-你可以在仓库顶部的 **Actions** 标签页看到进度（一个黄色的转圈圈，变成绿色的勾勾就代表成功了）。
-完成后，回到 **Settings -> Pages** 里，你就能看到你的专属网站链接啦！点击它就可以访问你的博客了。
+---
+
+## 💬 第六部分：如何配置 Gitalk 评论功能？
+
+Gitalk 是一个基于 GitHub 的评论插件。为了让它工作，你需要去 GitHub 申请一个“通行证”。
+
+1. 登录 [GitHub](https://github.com/)。
+2. 点击右上角头像 -> **Settings**。
+3. 左侧菜单滑到最底部，点击 **Developer settings**。
+4. 点击 **OAuth Apps** -> **New OAuth App**。
+5. 填写信息：
+   - **Application name**: 你的博客名字
+   - **Homepage URL**: 你的 GitHub Pages 网站链接（比如 `https://你的名字.github.io/myblog/`）
+   - **Authorization callback URL**: 填和 Homepage URL 一模一样的链接。
+6. 点击 **Register application**。
+7. 注册成功后，你会得到一个 **Client ID**。
+8. 点击 **Generate a new client secret**，生成一个 **Client Secret**。
+
+**把 `Client ID` 和 `Client Secret` 发给我，我就会帮你把评论区加到文章底部！**

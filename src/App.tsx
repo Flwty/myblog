@@ -449,8 +449,9 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="pt-32 pb-20">
-      <section className="px-6 max-w-4xl mx-auto mb-20">
+    <div className="pt-32 pb-20 px-6 max-w-6xl mx-auto flex flex-col gap-16">
+      {/* Top: Terminal (Full Width) */}
+      <section className="w-full">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -458,7 +459,7 @@ const Home = () => {
           className="pixel-dialog p-6 md:p-10 text-left"
         >
           <div className="absolute -top-5 left-6 bg-slate-800 text-white px-4 py-1 border-2 border-slate-800 text-sm tracking-widest uppercase">
-            Akihiro
+            Terminal
           </div>
           
           <p className="text-lg md:text-2xl leading-relaxed text-slate-700 whitespace-pre-wrap min-h-[120px]">
@@ -476,49 +477,71 @@ const Home = () => {
         </motion.div>
       </section>
 
-      <section className="px-6 max-w-5xl mx-auto">
-        <div className="flex justify-between items-end mb-10 border-b-4 border-slate-800 pb-4">
-          <h2 className="text-3xl font-bold uppercase tracking-widest">
-            <span className="text-slate-400 mr-2"><MagneticText text="#" /></span>
-            <MagneticText text="Recent Items" />
-          </h2>
-          <Link to="/journal" className="pixel-btn text-xs md:text-sm">
-            <MagneticText text="View All >>" />
-          </Link>
-        </div>
+      {/* Bottom: Info + Recent Items */}
+      <div className="flex flex-col lg:flex-row gap-10">
+        {/* Sidebar / Info */}
+        <aside className="w-full lg:w-1/3 flex-shrink-0">
+          <div className="pixel-dialog p-6 flex flex-col items-center text-center lg:sticky lg:top-32">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-800 mb-4 bg-slate-200">
+              <img src="https://picsum.photos/seed/avatar/200/200" alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            </div>
+            <h2 className="text-2xl font-bold uppercase tracking-widest mb-2"><MagneticText text="Akihiro" /></h2>
+            <p className="text-sm font-bold text-slate-500 mb-6">
+              Digital Nomad & Developer. I love building things and sharing my journey with the world.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <a href="#" className="pixel-btn px-3 py-1 text-xs">GitHub</a>
+              <a href="#" className="pixel-btn px-3 py-1 text-xs">Twitter</a>
+              <a href="#" className="pixel-btn px-3 py-1 text-xs">Instagram</a>
+            </div>
+          </div>
+        </aside>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {POSTS.slice(0, 2).map((post, index) => (
-            <motion.article
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="pixel-card flex flex-col p-4"
-            >
-              <div className="border-2 border-slate-800 mb-4 overflow-hidden bg-slate-200 aspect-video">
-                <img src={post.image} alt={post.title} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="pixel-tag">{post.category}</span>
-                <span className="text-xs text-slate-500 font-bold">{post.date}</span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight uppercase">
-                <MagneticText text={post.title} />
-              </h3>
-              <p className="text-sm text-slate-600 line-clamp-3 mb-6 flex-grow">
-                <MagneticText text={post.excerpt} />
-              </p>
-              <div className="mt-auto flex justify-end">
-                <Link to={`/post/${post.id}`} className="pixel-btn text-xs hover:bg-slate-200">
-                  <MagneticText text="READ >" />
-                </Link>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-      </section>
+        {/* Recent Items */}
+        <section className="w-full lg:w-2/3">
+          <div className="flex justify-between items-end mb-10 border-b-4 border-slate-800 pb-4">
+            <h2 className="text-3xl font-bold uppercase tracking-widest">
+              <span className="text-slate-400 mr-2"><MagneticText text="#" /></span>
+              <MagneticText text="Recent Items" />
+            </h2>
+            <Link to="/journal" className="pixel-btn text-xs md:text-sm">
+              <MagneticText text="View All >>" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {POSTS.slice(0, 4).map((post, index) => (
+              <motion.article
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="pixel-card flex flex-col p-4"
+              >
+                <div className="border-2 border-slate-800 mb-4 overflow-hidden bg-slate-200 aspect-video">
+                  <img src={post.image} alt={post.title} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="pixel-tag">{post.category}</span>
+                  <span className="text-xs text-slate-500 font-bold">{post.date}</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight uppercase tracking-widest">
+                  <MagneticText text={post.title} />
+                </h3>
+                <p className="text-sm text-slate-600 line-clamp-3 mb-6 flex-grow">
+                  <MagneticText text={post.excerpt} />
+                </p>
+                <div className="mt-auto flex justify-end">
+                  <Link to={`/post/${post.id}`} className="pixel-btn text-xs hover:bg-slate-200">
+                    <MagneticText text="READ >" />
+                  </Link>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
@@ -563,7 +586,7 @@ const Journal = () => {
                 <span className="pixel-tag">{post.category}</span>
                 <span className="text-xs text-slate-500 font-bold">{post.date}</span>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight uppercase">
+              <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight uppercase tracking-widest">
                 <MagneticText text={post.title} />
               </h3>
               <p className="text-sm text-slate-600 line-clamp-3 mb-6 flex-grow">
@@ -660,7 +683,7 @@ const Gallery = () => {
           return (
             <motion.div
               key={post.id}
-              className="absolute z-10"
+              className="absolute z-10 will-change-transform"
               style={{ left: `${left}%`, top: `${top}%` }}
               animate={{
                 x: [0, driftX, 0],
@@ -673,8 +696,8 @@ const Gallery = () => {
               }}
             >
               <Link to={`/post/${post.id}`} className="block group p-2">
-                <div className="text-sm md:text-base font-bold text-slate-400 group-hover:text-slate-800 transition-colors whitespace-nowrap drop-shadow-sm">
-                  <MagneticText text={`[ ${post.title} ]`} />
+                <div className="text-sm md:text-base font-bold text-slate-400 group-hover:text-slate-800 transition-colors whitespace-nowrap drop-shadow-sm tracking-widest">
+                  [ {post.title} ]
                 </div>
               </Link>
             </motion.div>
